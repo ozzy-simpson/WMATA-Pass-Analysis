@@ -30,8 +30,14 @@ This tool helps you determine if your WMATA monthly pass is saving you money bas
    - `--cost`: The cost of your monthly pass (e.g., 108.00)
 
 ### Example
-```sh
-uv run main.py Card_Usage_06.01.25-06.30.25.csv 80
+```console
+$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 80
+❌ You have not broken even with the pass. You need to spend at least $50.20 more to break even.
+```
+
+```console
+$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 72
+🤑 You have saved $918.80 with your pass!
 ```
 
 ## What-if Analysis
@@ -40,8 +46,13 @@ If you want to perform a what-if analysis with different pass costs or limits, y
 uv run main.py --csv={path/to/your_card_usage.csv} --cost={cost_of_your_monthly_pass} --limit={fare_limit}
 ```
 ### Example What-if Analysis
-```sh
-uv run main.py Card_Usage_06.01.25-06.30.25.csv 72 2.25
+```console
+$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 80 2.50
+❌ You would not break even with that pass. You'd need to spend at least $54.00 more to break even.
+```
+```console
+$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 72 2.25
+🤑 You would save $918.80 with that pass!
 ```
 
 ## Notes
