@@ -1,0 +1,12 @@
+[project]
+name = "metro-pass-breakeven"
+version = "1.0.0"
+description = "A tool to calculate if a WMATA pass was worth it based on actual usage."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fire>=0.7.0",
+    "pandas>=2.3.0",
+    "python-dotenv>=1.1.0",
+    "rapidfuzz>=3.13.0",
+]
