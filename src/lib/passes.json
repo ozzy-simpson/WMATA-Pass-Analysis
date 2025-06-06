@@ -1,0 +1,118 @@
+[
+	{
+		"name": "1-Day Unlimited Pass",
+		"price": 13.5,
+		"fareLimit": null
+	},
+	{
+		"name": "3-Day Unlimited Pass",
+		"price": 33.75,
+		"fareLimit": null
+	},
+	{
+		"name": "7-Day Short-Trip Pass",
+		"price": 40.5,
+		"fareLimit": 4.5
+	},
+	{
+		"name": "7-Day Unlimited Pass",
+		"price": 60.75,
+		"fareLimit": null
+	},
+	{
+		"name": "Monthly Unlimited Pass $2.25 Price Point",
+		"price": 72.0,
+		"fareLimit": 2.25
+	},
+
+	{
+		"name": "Monthly Unlimited Pass $2.50 Price Point",
+		"price": 80.0,
+		"fareLimit": 2.5
+	},
+	{
+		"name": "Monthly Unlimited Pass $2.75 Price Point",
+		"price": 88.0,
+		"fareLimit": 2.75
+	},
+	{
+		"name": "Monthly Unlimited Pass $3.00 Price Point",
+		"price": 96.0,
+		"fareLimit": 3.0
+	},
+	{
+		"name": "Monthly Unlimited Pass $3.25 Price Point",
+		"price": 104.0,
+		"fareLimit": 3.25
+	},
+	{
+		"name": "Monthly Unlimited Pass $3.50 Price Point",
+		"price": 112.0,
+		"fareLimit": 3.5
+	},
+	{
+		"name": "Monthly Unlimited Pass $3.75 Price Point",
+		"price": 120.0,
+		"fareLimit": 3.75
+	},
+	{
+		"name": "Monthly Unlimited Pass $4.00 Price Point",
+		"price": 128.0,
+		"fareLimit": 4.0
+	},
+	{
+		"name": "Monthly Unlimited Pass $4.25 Price Point",
+		"price": 136.0,
+		"fareLimit": 4.25
+	},
+	{
+		"name": "Monthly Unlimited Pass $4.50 Price Point",
+		"price": 144.0,
+		"fareLimit": 4.5
+	},
+	{
+		"name": "Monthly Unlimited Pass $4.75 Price Point",
+		"price": 152.0,
+		"fareLimit": 4.75
+	},
+	{
+		"name": "Monthly Unlimited Pass $5.00 Price Point",
+		"price": 160.0,
+		"fareLimit": 5.0
+	},
+	{
+		"name": "Monthly Unlimited Pass $5.25 Price Point",
+		"price": 168.0,
+		"fareLimit": 5.25
+	},
+	{
+		"name": "Monthly Unlimited Pass $5.50 Price Point",
+		"price": 176.0,
+		"fareLimit": 5.5
+	},
+	{
+		"name": "Monthly Unlimited Pass $5.75 Price Point",
+		"price": 184.0,
+		"fareLimit": 5.75
+	},
+	{
+		"name": "Monthly Unlimited Pass $6.00 Price Point",
+		"price": 192.0,
+		"fareLimit": 6.0
+	},
+	{
+		"name": "Monthly Unlimited Pass $6.25 Price Point",
+		"price": 200.0,
+		"fareLimit": 6.25
+	},
+	{
+		"name": "Monthly Unlimited Pass $6.50 Price Point",
+		"price": 208.0,
+		"fareLimit": 6.5
+	},
+	{
+		"name": "Monthly Unlimited Pass $6.75 Price Point",
+		"price": 216.0,
+		"fareLimit": 6.75
+	}
+]

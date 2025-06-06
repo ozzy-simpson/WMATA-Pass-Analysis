@@ -53,11 +53,9 @@ if __name__ == "__main__":
     # Example usage
     fares = get_fares()
     if fares:
-        print("Fares between stations:")
-        for (src, dst), fare in fares.items():
-            print(f"{src} -> {dst}:")
-            print(f"\tPeakTime: {fare['PeakTime']}")
-            print(f"\tOffPeakTime: {fare['OffPeakTime']}")
-            print(f"\tSeniorDisabled: {fare['SeniorDisabled']}")
+        # Save to JSON file with stringified tuple keys
+        serializable_fares = {f"{src}-{dst}": fare for (src, dst), fare in fares.items()}
+        with open('rail_fares.json', 'w') as f:
+            json.dump(serializable_fares, f, indent=4)
     else:
         print("Failed to retrieve fare data.")

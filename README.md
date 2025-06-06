@@ -1,61 +1,32 @@
-# Metro Pass Breakeven Calculator
+# WMATA Pass Analyzer
 
-This tool helps you determine if your WMATA monthly pass is saving you money based on your actual card usage. It parses your WMATA card usage CSV and compares your total regular fares to the cost of your pass plus any additional charges.
+This tool helps you analyze your WMATA Metro Pass usage by comparing your card usage data against fare data to determine the best pass for your travel patterns or determine if you saved money with your current pass.
 
-## Features
-- Parses WMATA card usage CSV files
-- Fuzzy matches station names to codes
-- Calculates regular fares for Metrorail and Metrobus
-- Checks if you have broken even on your monthly pass
-- What-if analysis for different pass costs/limits
+## Developing
 
-## Requirements
-- [WMATA API](https://developer.wmata.com) key (for station and fare data)
-- [UV](https://docs.astral.sh/uv/getting-started/installation/)
+Install dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
-## Installation
-1. Clone this repository.
-2. Create a `.env` file in the project root with your WMATA API key:
-   ```env
-   WMATA_API_KEY=your_api_key_here
-   ```
+```bash
+npm run dev
 
-## Basic Usage
-1. Export your WMATA card usage as a CSV from the WMATA website (go to your card summary -> Use History (under the History section) -> select the usage data you want to analyze -> click Submit -> download the CSV by clicking Export To Excel).
-2. Run the breakeven check:
-   ```sh
-   uv run main.py --csv={path/to/your_card_usage.csv} --cost={cost_of_your_monthly_pass}
-   ```
-   - `--csv`: Path to your card usage CSV file
-   - `--cost`: The cost of your monthly pass (e.g., 108.00)
-
-### Example
-```console
-$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 80
-❌ You have not broken even with the pass. You need to spend at least $50.20 more to break even.
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
 ```
 
-```console
-$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 72
-🤑 You have saved $918.80 with your pass!
+## Building
+
+To create a production version of the app:
+
+```bash
+npm run build
 ```
 
-## What-if Analysis
-If you want to perform a what-if analysis with different pass costs or limits, you can use the `--limit` flag to specify a different fare limit for the pass:
-```sh
-uv run main.py --csv={path/to/your_card_usage.csv} --cost={cost_of_your_monthly_pass} --limit={fare_limit}
-```
-### Example What-if Analysis
-```console
-$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 80 2.50
-❌ You would not break even with that pass. You'd need to spend at least $54.00 more to break even.
-```
-```console
-$ uv run main.py Card_Usage_06.01.25-06.30.25.csv 72 2.25
-🤑 You would save $918.80 with that pass!
+You can preview the production build with `npm run preview`.
+
+To deploy to cPanel, run:
+
+```bash
+npm run build:cpanel
 ```
 
-## Notes
-- The script uses the WMATA API to fetch up-to-date fare and station information.
-- Make sure your `.env` file contains a valid `WMATA_API_KEY`.
-- Only Metrorail and Metrobus rides are considered in the calculation, and Metrobus Express fares are not differentiated from regular fares.
+This will create a `to_upload.tar` that you can upload to your cPanel account and then extract it to your Node.js application directory. Set the startup file to `index.cjs` in your cPanel Node.js application settings.

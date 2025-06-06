@@ -44,8 +44,8 @@ if __name__ == "__main__":
     # Example usage
     station_dict = get_mapping()
     if station_dict:
-        print("Station names and their codes:")
-        for name, code in station_dict.items():
-            print(f"{name}: {code}")
+        # Save to JSON file
+        with open('station_codes.json', 'w') as f:
+            json.dump(station_dict, f, indent=4)
     else:
         print("Failed to retrieve station data.")
