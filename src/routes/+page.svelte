@@ -1,6 +1,7 @@
 <script lang="ts">
 	import passes from '$lib/passes.json';
 	import { calculatePassSavings } from '$lib/calculator';
+	import stationMapping from '$lib/station_codes.json';
 
 	let step = $state(1);
 	let loading = $state(true);
@@ -10,6 +11,12 @@
 	let pass = $state('');
 	let breakEven = $state(false);
 	let savings = $state(0);
+
+	const lastUpdate = new Date(stationMapping.last_updated).toLocaleDateString('en-US', {
+		year: 'numeric',
+		month: 'long',
+		day: 'numeric'
+	});
 
 	// Check if the file is valid
 	$effect(() => {
@@ -87,17 +94,19 @@
 <div class="step-container">
 	<div class="step">
 		{#if step == 1}
-			<h1>🚇🚍🏛️</h1>
+			<h1>🚇🏛️🌸🚍</h1>
 			<h1>Welcome to the WMATA Pass Analyzer</h1>
 			<p>
-				Simply upload your SmarTrip card usage, select a pass, and see how much money you saved (or
-				lost) with the pass!
+				Upload your SmarTrip card usage, select a pass, and see how much money you saved (or lost)
+				with the pass!
 			</p>
 			<button onclick={() => step++}>Start Analysis</button>
 		{:else if step == 2}
 			<h1>🚇 Where have you been?</h1>
 			<p>
-				This can be found in your SmarTrip account, under your card's Use History (Export to Excel).
+				Upload a CSV of your Card Usage history. This can be found in your SmarTrip account, under
+				your card's Use History (Export to Excel once you've selected the time period you wish to
+				analyze).
 			</p>
 			<input type="file" accept=".csv" multiple={false} bind:files />
 			<button onclick={() => step++} disabled={!files || !fileValid}>Next</button>
@@ -125,6 +134,13 @@
 				<h1>
 					🤑 You have saved <span class="savings">${savings.toFixed(2)}</span> with your pass!
 				</h1>
+				<p>
+					Why don't you go for a joy-ride? You could even do a <a
+						href="https://www.guinnessworldrecords.com/world-records/762637-fastest-time-to-visit-all-washington-d-c-metro-stations"
+						rel="noopener"
+						target="_blank">Metro speedrun</a
+					> for free!
+				</p>
 			{:else}
 				<h1>❌ You have not broken even with the pass.</h1>
 				<p>
@@ -146,7 +162,12 @@
 		Note that this tool is not affiliated with WMATA in any way. Data is processed locally in your
 		browser and may not be 100% accurate.
 	</p>
-	<p>Station, fare, and pass data as of June 6, 2025.</p>
+	<p>
+		<strong>Limitations:</strong> Express Metrobus routes are not supported (the tool assumes all bus
+		routes are $2.25). Reduced fares, the Farragut Crossing, and other Metrobus-to-Metrobus or Metrobus-to-Metrorail/Metrorail-to-Metrobus
+		transfers are not supported and thus no fare discounts are applied.
+	</p>
+	<p>Station, fare, and pass data as of {lastUpdate}.</p>
 	<br />
 	<p>
 		built with ☕️ and ❤️ by <a
@@ -166,7 +187,7 @@
 	@tailwind utilities;
 
 	.step-container {
-		@apply flex min-h-screen flex-col items-center justify-center bg-gray-100 p-4;
+		@apply flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gray-100 p-4;
 
 		@screen sm {
 			@apply p-6;
@@ -179,61 +200,69 @@
 		@screen lg {
 			@apply p-10;
 		}
+	}
 
-		.step {
-			@apply mx-auto text-center;
+	.step {
+		@apply mx-auto w-full max-w-[900px] text-center;
 
-			h1 {
-				@apply mb-4 text-3xl font-bold;
+		h1 {
+			@apply mb-4 text-3xl font-bold;
+		}
+
+		p {
+			@apply mb-4 text-lg text-gray-700;
+
+			a {
+				@apply text-blue-500 underline transition-colors hover:text-blue-600;
 			}
+		}
 
-			p {
-				@apply mb-4 text-lg text-gray-700;
+		.error {
+			@apply text-sm text-red-500;
+		}
+
+		.savings {
+			@apply font-bold text-green-500 underline;
+		}
+
+		.break-even {
+			@apply font-bold text-red-500 underline;
+		}
+
+		input[type='file'] {
+			@apply mb-4 w-full max-w-full cursor-pointer border border-gray-300 bg-white p-2 text-gray-700;
+			&::file-selector-button {
+				@apply mr-4 cursor-pointer px-4 font-semibold transition-colors;
 			}
-
-			.error {
-				@apply text-sm text-red-500;
+			&::placeholder {
+				@apply text-gray-50;
 			}
+		}
 
-			.savings {
-				@apply font-bold text-green-500 underline;
+		select {
+			@apply mb-4 w-full max-w-full cursor-pointer border border-gray-300 bg-white p-2 text-gray-700;
+			option {
+				@apply text-gray-700;
 			}
-
-			.break-even {
-				@apply font-bold text-red-500 underline;
+			&:focus {
+				@apply border-blue-500 outline-none;
 			}
+		}
 
-			input[type='file'] {
-				@apply mb-4 cursor-pointer border border-gray-300 bg-white p-2 text-gray-700;
-				&::file-selector-button {
-					@apply mr-4 cursor-pointer px-4 font-semibold transition-colors;
-				}
-				&::placeholder {
-					@apply text-gray-50;
-				}
-			}
-
-			select {
-				@apply mb-4 cursor-pointer border border-gray-300 bg-white p-2 text-gray-700;
-				option {
-					@apply text-gray-700;
-				}
-				&:focus {
-					@apply border-blue-500 outline-none;
-				}
-			}
-
-			button {
-				@apply bg-blue-500 px-4 py-2 text-white transition-colors disabled:opacity-50;
-				&:not(:disabled):hover {
-					@apply bg-blue-600;
-				}
+		button {
+			@apply bg-blue-500 px-4 py-2 text-white transition-colors disabled:opacity-50;
+			&:not(:disabled):hover {
+				@apply bg-blue-600;
 			}
 		}
 	}
 
 	footer {
 		@apply mt-8 mb-8 w-full px-4 text-center text-xs text-gray-400;
+
+		p {
+			@apply mb-2;
+		}
 
 		a {
 			@apply underline transition-colors hover:text-blue-500;

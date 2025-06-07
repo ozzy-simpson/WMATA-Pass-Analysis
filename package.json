@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
-        "build:cpanel": "npm run build && tar -cf to_upload.tar --exclude='.DS_Store' build package.json package-lock.json index.cjs",
+		"build:cpanel": "npm run updatefares && npm run build && tar -cf to_upload.tar --exclude='.DS_Store' build package.json package-lock.json index.cjs",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
@@ -14,7 +14,8 @@
 		"format": "prettier --write .",
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
-		"test": "npm run test:unit -- --run"
+		"test": "npm run test:unit -- --run",
+		"updatefares": "cd src/lib && uv run ../../utilities/code_to_code_fares.py && uv run ../../utilities/station_names_to_codes.py"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",

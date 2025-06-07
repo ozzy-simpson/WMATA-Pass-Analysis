@@ -1,3 +1,4 @@
+from datetime import datetime
 import urllib.request, json
 import os
 from dotenv import load_dotenv
@@ -55,7 +56,11 @@ if __name__ == "__main__":
     if fares:
         # Save to JSON file with stringified tuple keys
         serializable_fares = {f"{src}-{dst}": fare for (src, dst), fare in fares.items()}
+        to_save = {
+            "last_updated": datetime.now().isoformat(),
+            "fares": serializable_fares
+        }
         with open('rail_fares.json', 'w') as f:
-            json.dump(serializable_fares, f, indent=4)
+            json.dump(to_save, f, indent=4)
     else:
         print("Failed to retrieve fare data.")

@@ -1,3 +1,4 @@
+from datetime import datetime
 import urllib.request, json
 import os
 from dotenv import load_dotenv
@@ -44,8 +45,12 @@ if __name__ == "__main__":
     # Example usage
     station_dict = get_mapping()
     if station_dict:
+        to_save = {
+            "last_updated": datetime.now().isoformat(),
+            "stations": station_dict
+        }
         # Save to JSON file
         with open('station_codes.json', 'w') as f:
-            json.dump(station_dict, f, indent=4)
+            json.dump(to_save, f, indent=4)
     else:
         print("Failed to retrieve station data.")

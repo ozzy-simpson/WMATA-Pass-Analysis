@@ -19,7 +19,7 @@ function fuzzyMatchStation(stationName: string): string {
 	if (!stationName) return '';
 
 	// Get all station names
-	const stationNames = Object.keys(stationMapping);
+	const stationNames = Object.keys(stationMapping.stations);
 
 	// Find the closest match using fuzzy search
 	const match = search(stationName, stationNames, {
@@ -30,7 +30,7 @@ function fuzzyMatchStation(stationName: string): string {
 
 	if (match.length > 0) {
 		// Return the station code for the best match
-		return stationMapping[match[0] as keyof typeof stationMapping] || '';
+		return stationMapping.stations[match[0] as keyof typeof stationMapping.stations] || '';
 	}
 	// If no match found, return empty string
 	return '';
@@ -42,9 +42,9 @@ function isPeak(time: string): boolean {
 	const weekday = d.getDay();
 	const hour = d.getHours();
 	const minute = d.getMinutes();
-	// Peak: Mon-Fri, open to 9:30pm
+	// Peak: Mon-Fri, 5am to 9:30pm
 	if (weekday >= 1 && weekday <= 5) {
-		if (hour < 21 || (hour === 21 && minute < 30)) return true;
+		if (hour >= 5 || hour < 21 || (hour === 21 && minute < 30)) return true;
 	}
 	return false;
 }
@@ -59,7 +59,7 @@ export interface Ride {
 
 function getFare(entry: string, exit: string, peak: boolean): number {
 	const fareKey = `${entry}-${exit}`;
-	const fare = fares[fareKey as keyof typeof fares];
+	const fare = fares.fares[fareKey as keyof typeof fares.fares];
 	if (!fare) return 0;
 	return peak ? fare.PeakTime : fare.OffPeakTime;
 }
