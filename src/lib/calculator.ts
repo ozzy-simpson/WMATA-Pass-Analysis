@@ -1,5 +1,6 @@
 import fares from './rail_fares.json';
 import stationMapping from './station_codes.json';
+import gateStationMapping from './gate_station.json';
 import { search } from 'fast-fuzzy';
 
 // Helper to parse CSV string into array of objects
@@ -18,13 +19,24 @@ function parseCSV(csv: string): Record<string, string>[] {
 function fuzzyMatchStation(stationName: string): string {
 	if (!stationName) return '';
 
+	// If we have a direct mapping for the station name, use it
+	if (gateStationMapping[stationName as keyof typeof gateStationMapping]) {
+		return (
+			stationMapping.stations[
+				gateStationMapping[
+					stationName as keyof typeof gateStationMapping
+				] as keyof typeof stationMapping.stations
+			] || ''
+		);
+	}
+
 	// Get all station names
 	const stationNames = Object.keys(stationMapping.stations);
 
 	// Find the closest match using fuzzy search
 	const match = search(stationName, stationNames, {
 		keySelector: (name) => name,
-		threshold: 0.8,
+		threshold: 0.75,
 		limit: 1 // Only need the best match
 	});
 
