@@ -164,7 +164,7 @@
 	</p>
 	<p>
 		<strong>Limitations:</strong> Express Metrobus routes are not supported (the tool assumes all bus
-		routes are $2.25). Reduced fares, the Farragut Crossing, and other Metrobus-to-Metrobus or Metrobus-to-Metrorail/Metrorail-to-Metrobus
+		routes are $2.25). Reduced fares and other Metrobus-to-Metrobus or Metrobus-to-Metrorail/Metrorail-to-Metrobus
 		transfers are not supported and thus no fare discounts are applied.
 	</p>
 	<p>Station, fare, and pass data as of {lastUpdate}.</p>

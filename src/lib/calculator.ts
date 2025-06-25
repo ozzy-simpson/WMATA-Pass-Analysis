@@ -56,7 +56,7 @@ function isPeak(time: string): boolean {
 	const minute = d.getMinutes();
 	// Peak: Mon-Fri, 5am to 9:30pm
 	if (weekday >= 1 && weekday <= 5) {
-		if (hour >= 5 || hour < 21 || (hour === 21 && minute < 30)) return true;
+		if ((hour >= 5 && hour < 21) || (hour === 21 && minute < 30)) return true;
 	}
 	return false;
 }
@@ -65,7 +65,9 @@ export interface Ride {
 	peak: boolean;
 	type: string;
 	entry_location: string;
+	entry_time?: Date;
 	exit_location: string;
+	exit_time?: Date;
 	regular_cost: number;
 }
 
@@ -78,6 +80,7 @@ function getFare(entry: string, exit: string, peak: boolean): number {
 
 function createRides(rows: Record<string, string>[]): Ride[] {
 	const rides: Ride[] = [];
+	// First, create our rides from the CSV rows
 	for (let i = 0; i < rows.length; i++) {
 		const row = rows[i];
 		if (row['Operator'] === 'Metrobus') {
@@ -85,12 +88,13 @@ function createRides(rows: Record<string, string>[]): Ride[] {
 				peak: isPeak(row['Time']),
 				type: 'Metrobus',
 				entry_location: fuzzyMatchStation(row['Entry Location/ Bus Route']),
+				entry_time: new Date(row['Time']),
 				exit_location: '',
 				regular_cost: 2.25
 			});
 		} else if (row['Operator'] === 'Metrorail' && row['Description'] === 'Exit') {
 			// Try to find the previous entry row
-			let entryRow = i > 0 ? rows[i - 1] : row;
+			let entryRow = i + 1 < rows.length ? rows[i + 1] : row;
 			if (entryRow['Description'] !== 'Entry') entryRow = row;
 			const entryCode = fuzzyMatchStation(row['Entry Location/ Bus Route']);
 			const exitCode = fuzzyMatchStation(row['Exit Location']);
@@ -99,12 +103,68 @@ function createRides(rows: Record<string, string>[]): Ride[] {
 				peak,
 				type: 'Metrorail',
 				entry_location: entryCode,
+				entry_time: new Date(entryRow['Time']),
 				exit_location: exitCode,
+				exit_time: new Date(row['Time']),
 				regular_cost: getFare(entryCode, exitCode, peak)
 			});
 		}
 	}
-	return rides;
+
+	// Apply Farragut Crossing discount
+	const newRides: Ride[] = [];
+	for (let i = 0; i < rides.length; i++) {
+		const ride = rides[i];
+		// Deal with entry rides at a Farragut station
+		if (
+			ride.type === 'Metrorail' &&
+			isFarragutStation(ride.entry_location) &&
+			ride.entry_time !== undefined
+		) {
+			let foundTransfer = false;
+			const oppositeFarragutStation = ride.entry_location === 'A02' ? 'C03' : 'A02';
+
+			// Look for a previous ride that had an exit at the opposite Farragut station within 30 minutes
+			for (let j = i + 1; j < rides.length; j++) {
+				const prevRide = rides[j];
+
+				if (
+					prevRide.type !== 'Metrorail' ||
+					!isFarragutStation(prevRide.exit_location) ||
+					prevRide.exit_time === undefined
+				)
+					continue; // Skip non-rail, non-Farragut, or rides without exit time
+
+				const timeDiff = (ride.entry_time.getTime() - prevRide.exit_time.getTime()) / (1000 * 60); // minutes
+
+				if (timeDiff > 30) break; // Transfer was too long ago
+
+				if (prevRide.exit_location === oppositeFarragutStation) {
+					foundTransfer = true;
+					newRides.push({
+						...ride,
+						peak: prevRide.peak,
+						entry_location: prevRide.entry_location,
+						entry_time: prevRide.entry_time,
+						regular_cost: getFare(prevRide.entry_location, ride.exit_location, prevRide.peak)
+					});
+
+					// Remove the previous ride since it was used for the transfer
+					rides.splice(j, 1);
+					break;
+				}
+			}
+
+			if (!foundTransfer) newRides.push(ride); // If no transfer found, keep the original ride
+		} else newRides.push(ride); // For all other rides, just add them as is
+	}
+	return newRides;
+}
+
+function isFarragutStation(station: string): boolean {
+	// Get all station codes that start with 'Farragut'
+	const farragutCodes = ['A02', 'C03'];
+	return farragutCodes.includes(station);
 }
 
 export function calculatePassSavings(
