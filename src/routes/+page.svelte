@@ -1,6 +1,6 @@
 <script lang="ts">
 	import passes from '$lib/passes.json';
-	import { calculatePassSavings } from '$lib/calculator';
+	import { calculatePassSavings, type Ride } from '$lib/calculator';
 	import stationMapping from '$lib/station_codes.json';
 
 	let step = $state(1);
@@ -11,6 +11,10 @@
 	let pass = $state('');
 	let breakEven = $state(false);
 	let savings = $state(0);
+	let spent = $state(0);
+	let cost = $state(0);
+	let rides = $state<Ride[]>([]);
+	let showRides = $state(false);
 
 	const lastUpdate = new Date(stationMapping.last_updated).toLocaleDateString('en-US', {
 		year: 'numeric',
@@ -86,10 +90,17 @@
 			);
 			savings = result.savings;
 			breakEven = result.brokeEven;
+			spent = result.totalCost;
+			cost = result.totalSpent;
+			rides = result.rides || [];
 			loading = false;
 		}
 	});
 </script>
+
+<svelte:head>
+	<title>WMATA Pass Analyzer</title>
+</svelte:head>
 
 <div class="step-container">
 	<div class="step">
@@ -134,20 +145,110 @@
 				<h1>
 					🤑 You have saved <span class="savings">${savings.toFixed(2)}</span> with your pass!
 				</h1>
+				<div class="spending-breakdown">
+					<div class="calculation-cards">
+						<div class="spending-card total-spent">
+							<div class="card-label">Total spent (with pass)</div>
+							<div class="card-amount">${cost.toFixed(2)}</div>
+						</div>
+						<div class="calculation-operator">&minus;</div>
+						<div class="spending-card without-pass">
+							<div class="card-label">Would have spent (without pass)</div>
+							<div class="card-amount">${spent.toFixed(2)}</div>
+						</div>
+						<div class="calculation-operator">=</div>
+						<div class="spending-card savings-card">
+							<div class="card-label">Your Savings</div>
+							<div class="card-amount savings">${savings.toFixed(2)}</div>
+						</div>
+					</div>
+				</div>
 				<p>
-					Why don't you go for a joy-ride? You could even do a <a
-						href="https://www.guinnessworldrecords.com/world-records/762637-fastest-time-to-visit-all-washington-d-c-metro-stations"
+					Why don't you go for a joy-ride? You could even <a
+						href="https://www.reddit.com/r/washingtondc/comments/1kvtcs3/update_is_it_possible_to_swipe_in_and_out_of/"
 						rel="noopener"
-						target="_blank">Metro speedrun</a
-					> for free!
+						target="_blank">visit every station</a
+					> for free (just remember to tap in/out at each one)!
 				</p>
 			{:else}
 				<h1>❌ You have not broken even with the pass.</h1>
-				<p>
-					You need to spend at least <span class="break-even">${savings.toFixed(2)}</span> more to break
-					even.
-				</p>
+				<div class="spending-breakdown">
+					<div class="calculation-cards">
+						<div class="spending-card total-spent">
+							<div class="card-label">Total spent (with pass)</div>
+							<div class="card-amount">${cost.toFixed(2)}</div>
+						</div>
+						<div class="calculation-operator">&minus;</div>
+						<div class="spending-card without-pass">
+							<div class="card-label">Would have spent (without pass)</div>
+							<div class="card-amount">${spent.toFixed(2)}</div>
+						</div>
+						<div class="calculation-operator">=</div>
+						<div class="spending-card loss-card">
+							<div class="card-label">Additional Cost</div>
+							<div class="card-amount break-even">${Math.abs(savings).toFixed(2)}</div>
+						</div>
+					</div>
+				</div>
 			{/if}
+
+			{#if rides.length > 0}
+				<div class="rides-section">
+					<button class="toggle-rides" onclick={() => (showRides = !showRides)}>
+						{showRides ? '🔼 Hide' : '🔽 Show'} Ride Details ({rides.length} rides)
+					</button>
+
+					{#if showRides}
+						<div class="rides-table-container">
+							<table class="rides-table">
+								<thead class="bg-gray-100">
+									<tr>
+										<th>Entry Time</th>
+										<th>Exit Time</th>
+										<th>Type</th>
+										<th>From</th>
+										<th>To</th>
+										<th>Fare</th>
+									</tr>
+								</thead>
+								<tbody>
+									{#each rides as ride}
+										<tr>
+											<td>{ride.entry_time?.toLocaleString()}</td>
+											<td>{ride.type == 'Metrobus' ? '-' : ride.exit_time?.toLocaleString()}</td>
+											<td>{ride.type}</td>
+											<td
+												>{ride.type == 'Metrobus'
+													? '-'
+													: stationMapping.codes[
+															ride.entry_location as keyof typeof stationMapping.codes
+														]}</td
+											>
+											<td
+												>{ride.exit_location
+													? stationMapping.codes[
+															ride.exit_location as keyof typeof stationMapping.codes
+														] || '-'
+													: '-'}</td
+											>
+											<td>
+												${ride.regular_cost.toFixed(2)}
+												{#if ride.peak}
+													<span
+														style="background:#fbbf24;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75em;margin-left:6px;"
+														>Peak</span
+													>
+												{/if}
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					{/if}
+				</div>
+			{/if}
+
 			<button
 				onclick={() => {
 					step = 1;
@@ -187,23 +288,11 @@
 	@tailwind utilities;
 
 	.step-container {
-		@apply flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gray-100 p-4;
-
-		@screen sm {
-			@apply p-6;
-		}
-
-		@screen md {
-			@apply p-8;
-		}
-
-		@screen lg {
-			@apply p-10;
-		}
+		@apply flex min-h-screen flex-col items-center justify-center overflow-hidden bg-gray-100 p-4 sm:p-6 md:p-8 lg:p-10;
 	}
 
 	.step {
-		@apply mx-auto w-full max-w-[900px] text-center;
+		@apply mx-auto w-full max-w-[940px] text-center;
 
 		h1 {
 			@apply mb-4 text-3xl font-bold;
@@ -221,12 +310,82 @@
 			@apply text-sm text-red-500;
 		}
 
-		.savings {
-			@apply font-bold text-green-500 underline;
+		.spending-breakdown {
+			@apply mb-5;
+
+			.calculation-cards {
+				@apply flex flex-col items-center justify-center gap-2 sm:flex-row sm:flex-wrap sm:gap-4 md:flex-nowrap;
+			}
+
+			.spending-card {
+				@apply flex min-w-[140px] flex-col items-center rounded-lg border bg-white p-4 shadow-md md:min-w-[160px];
+			}
+
+			.total-spent {
+				@apply border-blue-200 bg-blue-50;
+			}
+
+			.without-pass {
+				@apply border-gray-200 bg-gray-50;
+			}
+
+			.savings-card {
+				@apply border-green-200 bg-green-50;
+			}
+
+			.loss-card {
+				@apply border-red-200 bg-red-50;
+			}
+
+			.card-label {
+				@apply mb-2 text-center text-xs font-medium text-gray-600;
+			}
+
+			.card-amount {
+				@apply text-xl font-bold text-gray-800;
+			}
+
+			.calculation-operator {
+				@apply text-2xl font-bold text-gray-600;
+			}
+
+			.savings {
+				@apply font-bold text-green-500 underline;
+			}
+
+			.break-even {
+				@apply font-bold text-red-500 underline;
+			}
 		}
 
-		.break-even {
-			@apply font-bold text-red-500 underline;
+		.rides-section {
+			@apply mt-6 w-full;
+		}
+
+		.toggle-rides {
+			@apply mb-4 bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600;
+		}
+
+		.rides-table-container {
+			@apply mb-4 max-h-96 overflow-auto rounded border border-gray-300;
+		}
+
+		.rides-table {
+			@apply w-full border-collapse text-left text-sm;
+
+			th {
+				@apply sticky top-0 bg-gray-100 px-3 py-2 font-semibold text-gray-700;
+				border-bottom: 1px solid #e5e7eb;
+			}
+
+			td {
+				@apply px-3 py-2 text-gray-600;
+				border-bottom: 1px solid #f3f4f6;
+			}
+
+			tr:hover {
+				@apply bg-gray-50;
+			}
 		}
 
 		input[type='file'] {

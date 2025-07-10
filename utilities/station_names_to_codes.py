@@ -45,9 +45,13 @@ if __name__ == "__main__":
     # Example usage
     station_dict = get_mapping()
     if station_dict:
+        # Create reverse mapping from codes to names
+        code_to_names = {code: name for name, code in station_dict.items()}
+        
         to_save = {
             "last_updated": datetime.now().isoformat(),
-            "stations": station_dict
+            "stations": station_dict,
+            "codes": code_to_names
         }
         # Save to JSON file
         with open('station_codes.json', 'w') as f:

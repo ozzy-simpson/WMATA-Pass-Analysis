@@ -171,7 +171,7 @@ export function calculatePassSavings(
 	csv: string,
 	passCost: number,
 	passLimit: number
-): { totalCost: number; totalSpent: number; savings: number; brokeEven: boolean } {
+): { totalCost: number; totalSpent: number; savings: number; brokeEven: boolean; rides: Ride[] } {
 	const rows = parseCSV(csv);
 	const rides = createRides(rows);
 
@@ -185,6 +185,7 @@ export function calculatePassSavings(
 		totalCost,
 		totalSpent,
 		savings: Math.abs(savings),
-		brokeEven: totalCost >= totalSpent
+		brokeEven: totalCost >= totalSpent,
+		rides: rides
 	};
 }
