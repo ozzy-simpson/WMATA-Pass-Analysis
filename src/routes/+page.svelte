@@ -212,10 +212,24 @@
 									</tr>
 								</thead>
 								<tbody>
-									{#each rides as ride}
+									{#each rides as ride (ride.entry_time)}
 										<tr>
-											<td>{ride.entry_time?.toLocaleString()}</td>
-											<td>{ride.type == 'Metrobus' ? '-' : ride.exit_time?.toLocaleString()}</td>
+											<td
+												>{ride.entry_time
+													? ride.entry_time.toLocaleString('en-US', {
+															dateStyle: 'short',
+															timeStyle: 'short'
+														})
+													: ''}</td
+											>
+											<td
+												>{ride.type == 'Metrobus'
+													? '-'
+													: ride.exit_time?.toLocaleString('en-US', {
+															dateStyle: 'short',
+															timeStyle: 'short'
+														})}</td
+											>
 											<td>{ride.type}</td>
 											<td
 												>{ride.type == 'Metrobus'
