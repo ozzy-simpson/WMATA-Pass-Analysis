@@ -1,9 +1,9 @@
 {
-    "last_updated": "2025-11-19T15:57:43.152828",
+    "last_updated": "2026-06-02T16:44:24.102157",
     "fares": {
         "A01-A02": {
-            "PeakTime": 2.0,
-            "OffPeakTime": 2.0,
+            "PeakTime": 2.25,
+            "OffPeakTime": 2.25,
             "SeniorDisabled": 1.1
         },
         "A01-A03": {
@@ -13622,8 +13622,8 @@
             "SeniorDisabled": 3.0
         },
         "C01-A02": {
-            "PeakTime": 2.0,
-            "OffPeakTime": 2.0,
+            "PeakTime": 2.25,
+            "OffPeakTime": 2.25,
             "SeniorDisabled": 1.1
         },
         "C01-A03": {
