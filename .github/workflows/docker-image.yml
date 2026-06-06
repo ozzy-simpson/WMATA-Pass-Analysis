@@ -1,0 +1,64 @@
+name: Build and deploy Docker image to Forgejo
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      IMAGE_NAME: "${{ secrets.DOCKER_IMAGE_NAME }}"
+      CONTAINER_NAME: "${{ secrets.DOCKER_CONTAINER_NAME }}"
+      CONTAINER_PORT: "3000"
+      SSH_HOST: "${{ secrets.SSH_HOST }}"
+      SSH_USER: "${{ secrets.SSH_USER }}"
+      SSH_PORT: "${{ secrets.SSH_PORT }}"
+      FORGEJO_REGISTRY: "${{ secrets.FORGEJO_REGISTRY }}"
+      FORGEJO_IMAGE: "${{ secrets.FORGEJO_REGISTRY }}/${{ secrets.FORGEJO_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      - name: Install uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b # v8.1.0
+      - name: Install the project
+        run: uv sync --dev
+      - name: Generate fare & station files
+        env:
+          WMATA_API_KEY: ${{ secrets.WMATA_API_KEY }}
+        run: |
+          set -e
+          cd utilities
+          uv run code_to_code_fares.py || echo "code_to_code_fares failed"
+          uv run station_names_to_codes.py || echo "station_names_to_codes failed"
+          mv rail_fares.json ../src/lib/ || true
+          mv station_codes.json ../src/lib/ || true
+      - name: Log in to Forgejo registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.FORGEJO_REGISTRY }}
+          username: ${{ secrets.FORGEJO_USERNAME }}
+          password: ${{ secrets.FORGEJO_TOKEN }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.FORGEJO_IMAGE }}:${{ github.sha }}
+            ${{ env.FORGEJO_IMAGE }}:latest
+      - name: Prepare SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.SSH_KNOWN_HOST }}" >> ~/.ssh/known_hosts
+      - name: Pull image and restart container on remote host
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
+            "docker login $FORGEJO_REGISTRY \
+               -u ${{ secrets.FORGEJO_USERNAME }} \
+               -p ${{ secrets.FORGEJO_TOKEN }} && \
+             docker pull $FORGEJO_IMAGE:latest && \
+             docker compose -f /opt/services/docker-compose.yml up -d --no-build $CONTAINER_NAME"
