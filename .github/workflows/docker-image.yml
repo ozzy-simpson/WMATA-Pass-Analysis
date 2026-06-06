@@ -17,6 +17,7 @@ jobs:
       SSH_PORT: "${{ secrets.SSH_PORT }}"
       FORGEJO_REGISTRY: "${{ secrets.FORGEJO_REGISTRY }}"
       FORGEJO_IMAGE: "${{ secrets.FORGEJO_REGISTRY }}/${{ secrets.FORGEJO_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}"
+      DOCKER_COMPOSE_PATH: "${{ vars.DOCKER_COMPOSE_PATH }}"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -58,4 +59,4 @@ jobs:
         run: |
           ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
             "docker pull $FORGEJO_IMAGE:latest && \
-             docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} up -d --no-build $CONTAINER_NAME"
+             docker compose -f $DOCKER_COMPOSE_PATH up -d --no-build $CONTAINER_NAME"
