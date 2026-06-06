@@ -41,7 +41,7 @@ jobs:
           username: ${{ secrets.FORGEJO_USERNAME }}
           password: ${{ secrets.FORGEJO_TOKEN }}
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -57,8 +57,5 @@ jobs:
       - name: Pull image and restart container on remote host
         run: |
           ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" \
-            "docker login $FORGEJO_REGISTRY \
-               -u ${{ secrets.FORGEJO_USERNAME }} \
-               -p ${{ secrets.FORGEJO_TOKEN }} && \
-             docker pull $FORGEJO_IMAGE:latest && \
-             docker compose -f /opt/services/docker-compose.yml up -d --no-build $CONTAINER_NAME"
+            "docker pull $FORGEJO_IMAGE:latest && \
+             docker compose -f ${{ env.DOCKER_COMPOSE_PATH }} up -d --no-build $CONTAINER_NAME"
