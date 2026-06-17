@@ -126,21 +126,21 @@
 			<h1>🚇🏛️🌸🚍</h1>
 			<h1>Welcome to the WMATA Pass Analyzer</h1>
 			<p>
-				Upload your SmarTrip card usage, select a pass, and see how much money you saved (or lost)
+				Upload your Smart Trip card usage, select a pass, and see how much money you saved (or lost)
 				with the pass!
 			</p>
 			<button onclick={() => step++}>Start Analysis</button>
 		{:else if step == 2}
 			<h1>🚇 Where have you been?</h1>
 			<p>
-				Upload a CSV of your Card Usage history. This can be found in your SmarTrip account, under
+				Upload a CSV of your Card Usage history. This can be found in your <a href="https://smarttrip.wmata.com/" target="_blank">Smart Trip account</a>, under
 				your card's Use History (Export to Excel once you've selected the time period you wish to
 				analyze).
 			</p>
 			<input type="file" accept=".csv" multiple={false} bind:files />
 			<button onclick={() => step++} disabled={!files || !fileValid}>Next</button>
 			{#if files && !fileValid}
-				<p class="error">Please upload a valid card usage CSV file from your SmarTrip account.</p>
+				<p class="error">Please upload a valid card usage CSV file from your Smart Trip account.</p>
 			{/if}
 		{:else if step == 3}
 			<h1>🎟️ Which pass did you purchase?</h1>
