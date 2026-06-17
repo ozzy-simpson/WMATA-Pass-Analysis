@@ -247,10 +247,10 @@
 											>
 											<td>
 												${ride.regular_cost.toFixed(2)}
-												{#if ride.peak}
+												{#if !ride.peak}
 													<span
 														style="background:#fbbf24;color:#fff;padding:2px 6px;border-radius:4px;font-size:0.75em;margin-left:6px;"
-														>Peak</span
+														>Off-Peak</span
 													>
 												{/if}
 											</td>
@@ -381,7 +381,7 @@
 		}
 
 		.rides-table-container {
-			@apply mb-4 max-h-96 overflow-auto rounded border border-gray-300;
+			@apply mb-4 max-h-96 overflow-auto overscroll-none rounded border border-gray-300;
 		}
 
 		.rides-table {
