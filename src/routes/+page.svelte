@@ -15,6 +15,9 @@
 	let cost = $state(0);
 	let rides = $state<Ride[]>([]);
 	let showRides = $state(false);
+	let bestPass = $state('');
+	let bestPassSavings = $state(0);
+	let bestPassIsBest = $state(false);
 
 	const lastUpdate = new Date(stationMapping.last_updated).toLocaleDateString('en-US', {
 		year: 'numeric',
@@ -74,6 +77,7 @@
 	// Handle the analysis step
 	$effect(() => {
 		if (step === 4 && csvData && pass) {
+			const csv = csvData;
 			loading = true;
 			// Get pass details
 			const selectedPass = passes.find((p) => p.name === pass);
@@ -84,15 +88,29 @@
 			}
 
 			const result = calculatePassSavings(
-				csvData,
+				csv,
 				selectedPass.price,
 				selectedPass.fareLimit || Infinity
 			);
+
+			const passResults = passes.map((p) => ({
+				pass: p,
+				result: calculatePassSavings(csv, p.price, p.fareLimit || Infinity)
+			}));
+
+			const best = passResults.reduce((bestSoFar, current) =>
+				current.result.totalSpent < bestSoFar.result.totalSpent ? current : bestSoFar,
+				passResults[0]
+			);
+
 			savings = result.savings;
 			breakEven = result.brokeEven;
 			spent = result.totalCost;
 			cost = result.totalSpent;
 			rides = result.rides || [];
+			bestPass = best.pass.name;
+			bestPassIsBest = best.pass.name === selectedPass.name;
+			bestPassSavings = bestPassIsBest ? 0 : Math.max(0, result.totalSpent - best.result.totalSpent);
 			loading = false;
 		}
 	});
@@ -136,11 +154,15 @@
 					<option value={p.name}>{p.name} - ${p.price.toFixed(2)}</option>
 				{/each}
 			</select>
-			<button onclick={() => step++} disabled={!pass}>Next</button>
+			<button onclick={() => {
+					step++;
+					loading = true;
+				}} disabled={!pass}>Next</button>
 		{:else if step == 4 && loading}
 			<h1>🧮 Calculating...</h1>
 			<p>Please wait while we analyze your data.</p>
 		{:else if step == 4 && !loading}
+
 			{#if breakEven}
 				<h1>
 					🤑 You have saved <span class="savings">${savings.toFixed(2)}</span> with your pass!
@@ -190,6 +212,18 @@
 						</div>
 					</div>
 				</div>
+			{/if}
+
+
+			{#if bestPassIsBest}
+				<p class="recommendation best">
+					Nice! The pass you selected is the best option for your usage.
+				</p>
+			{:else}
+				<p class="recommendation">
+					Based on your rides, <strong>{bestPass}</strong> would have had the lowest total cost.
+					You would have saved <strong>${bestPassSavings.toFixed(2)}</strong> compared to the pass you selected.
+				</p>
 			{/if}
 
 			{#if rides.length > 0}
@@ -322,6 +356,14 @@
 
 		.error {
 			@apply text-sm text-red-500;
+		}
+
+		.recommendation {
+			@apply mb-4 rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-800 shadow-sm text-center;
+		}
+
+		.recommendation.best {
+			@apply border-green-200 bg-green-50 text-green-800;
 		}
 
 		.spending-breakdown {
