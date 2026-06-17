@@ -98,8 +98,9 @@
 				result: calculatePassSavings(csv, p.price, p.fareLimit || Infinity)
 			}));
 
-			const best = passResults.reduce((bestSoFar, current) =>
-				current.result.totalSpent < bestSoFar.result.totalSpent ? current : bestSoFar,
+			const best = passResults.reduce(
+				(bestSoFar, current) =>
+					current.result.totalSpent < bestSoFar.result.totalSpent ? current : bestSoFar,
 				passResults[0]
 			);
 
@@ -110,7 +111,9 @@
 			rides = result.rides || [];
 			bestPass = best.pass.name;
 			bestPassIsBest = best.pass.name === selectedPass.name;
-			bestPassSavings = bestPassIsBest ? 0 : Math.max(0, result.totalSpent - best.result.totalSpent);
+			bestPassSavings = bestPassIsBest
+				? 0
+				: Math.max(0, result.totalSpent - best.result.totalSpent);
 			loading = false;
 		}
 	});
@@ -133,9 +136,11 @@
 		{:else if step == 2}
 			<h1>🚇 Where have you been?</h1>
 			<p>
-				Upload a CSV of your Card Usage history. This can be found in your <a href="https://smarttrip.wmata.com/" target="_blank">Smart Trip account</a>, under
-				your card's Use History (Export to Excel once you've selected the time period you wish to
-				analyze).
+				Upload a CSV of your Card Usage history. This can be found in your <a
+					href="https://smarttrip.wmata.com/"
+					target="_blank">Smart Trip account</a
+				>, under your card's Use History (Export to Excel once you've selected the time period you
+				wish to analyze).
 			</p>
 			<input type="file" accept=".csv" multiple={false} bind:files />
 			<button onclick={() => step++} disabled={!files || !fileValid}>Next</button>
@@ -154,15 +159,17 @@
 					<option value={p.name}>{p.name} - ${p.price.toFixed(2)}</option>
 				{/each}
 			</select>
-			<button onclick={() => {
+			<button
+				onclick={() => {
 					step++;
 					loading = true;
-				}} disabled={!pass}>Next</button>
+				}}
+				disabled={!pass}>Next</button
+			>
 		{:else if step == 4 && loading}
 			<h1>🧮 Calculating...</h1>
 			<p>Please wait while we analyze your data.</p>
 		{:else if step == 4 && !loading}
-
 			{#if breakEven}
 				<h1>
 					🤑 You have saved <span class="savings">${savings.toFixed(2)}</span> with your pass!
@@ -214,15 +221,14 @@
 				</div>
 			{/if}
 
-
 			{#if bestPassIsBest}
 				<p class="recommendation best">
 					Nice! The pass you selected is the best option for your usage.
 				</p>
 			{:else}
 				<p class="recommendation">
-					Based on your rides, <strong>{bestPass}</strong> would have had the lowest total cost.
-					You would have saved <strong>${bestPassSavings.toFixed(2)}</strong> compared to the pass you selected.
+					Based on your rides, <strong>{bestPass}</strong> would have had the lowest total cost. You
+					would have saved <strong>${bestPassSavings.toFixed(2)}</strong> compared to the pass you selected.
 				</p>
 			{/if}
 
@@ -359,7 +365,7 @@
 		}
 
 		.recommendation {
-			@apply mb-4 rounded-lg border border-gray-200 bg-white p-4 text-sm text-gray-800 shadow-sm text-center;
+			@apply mb-4 rounded-lg border border-gray-200 bg-white p-4 text-center text-sm text-gray-800 shadow-sm;
 		}
 
 		.recommendation.best {

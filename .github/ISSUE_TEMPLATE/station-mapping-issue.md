@@ -4,24 +4,25 @@ about: Report a missing or incorrect station mapping found in a Smart Trip CSV e
 title: 'Station mapping issue: '
 labels: bug, station-mapping
 assignees: ozzy-simpson
-
 ---
 
 ## Issue type
+
 - [ ] No match
 - [ ] Wrong match
 - [ ] Other (briefly explain)
 
 ## Raw station data
-- Raw station text (from CSV):  
-  
 
-- CSV row (optional — paste the full row if possible):  
+- Raw station text (from CSV):
+
+- CSV row (optional — paste the full row if possible):
   ```csv
   Paste CSV row here
   ```
 
 ## Expected
+
 - Expected station name or code:
 
 ---

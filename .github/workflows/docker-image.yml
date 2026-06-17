@@ -9,15 +9,15 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     env:
-      IMAGE_NAME: "${{ secrets.DOCKER_IMAGE_NAME }}"
-      CONTAINER_NAME: "${{ secrets.DOCKER_CONTAINER_NAME }}"
-      CONTAINER_PORT: "3000"
-      SSH_HOST: "${{ secrets.SSH_HOST }}"
-      SSH_USER: "${{ secrets.SSH_USER }}"
-      SSH_PORT: "${{ secrets.SSH_PORT }}"
-      FORGEJO_REGISTRY: "${{ secrets.FORGEJO_REGISTRY }}"
-      FORGEJO_IMAGE: "${{ secrets.FORGEJO_REGISTRY }}/${{ secrets.FORGEJO_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}"
-      DOCKER_COMPOSE_PATH: "${{ vars.DOCKER_COMPOSE_PATH }}"
+      IMAGE_NAME: '${{ secrets.DOCKER_IMAGE_NAME }}'
+      CONTAINER_NAME: '${{ secrets.DOCKER_CONTAINER_NAME }}'
+      CONTAINER_PORT: '3000'
+      SSH_HOST: '${{ secrets.SSH_HOST }}'
+      SSH_USER: '${{ secrets.SSH_USER }}'
+      SSH_PORT: '${{ secrets.SSH_PORT }}'
+      FORGEJO_REGISTRY: '${{ secrets.FORGEJO_REGISTRY }}'
+      FORGEJO_IMAGE: '${{ secrets.FORGEJO_REGISTRY }}/${{ secrets.FORGEJO_USERNAME }}/${{ secrets.DOCKER_IMAGE_NAME }}'
+      DOCKER_COMPOSE_PATH: '${{ vars.DOCKER_COMPOSE_PATH }}'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6

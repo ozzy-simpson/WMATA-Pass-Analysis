@@ -15,7 +15,7 @@
 		"lint": "prettier --check . && eslint .",
 		"test:unit": "vitest",
 		"test": "npm run test:unit -- --run",
-        "updatefares": "cd utilities && uv run code_to_code_fares.py && uv run station_names_to_codes.py && mv rail_fares.json station_codes.json ../src/lib/"
+		"updatefares": "cd utilities && uv run code_to_code_fares.py && uv run station_names_to_codes.py && mv rail_fares.json station_codes.json ../src/lib/"
 	},
 	"devDependencies": {
 		"@eslint/compat": "^1.2.5",
